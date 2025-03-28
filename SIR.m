@@ -2,12 +2,12 @@
 
 clear
 clc
-close all
+%close all
 
 %parameters
 tau=1;                  %time people are sick
 tspan=[0 20];               %time
-delay = false;
+delay = true;           %dde if true, ode if false
 
 %initial conditions
 S0=99;                   %initial susceptible
@@ -23,11 +23,13 @@ if delay
     t_val = sol.x;
     y_val = sol.y;
 else
-    a=0.1;              %infection rate
-    b=0.2;              %recovery rate
+    [a, b] = def_ab;
 
     [t_val, y_val] = ode45(@(t, y) SIR_ODE_eqns(t, y), tspan, y0);
 end
+
+%disp(["",length(y_val)])
+%disp(["",length(t_val)])
 
 if (length(t_val) ~= length(y_val))
     y_val_interp = interp1(linspace(t_val(1), t_val(end), size(y_val, 2)), y_val', t_val, 'linear')';
@@ -35,19 +37,32 @@ else
     y_val_interp = y_val;
 end
 
-disp(["",length(y_val_interp)])
-disp(["",length(t_val)])
+%disp(["",length(y_val_interp)])
+%disp(["",length(t_val)])
 
-figure;
-plot(t_val, y_val_interp(1,:),'-g', 'LineWidth', 2, 'DisplayName', 'Susceptible');
-hold on;
-plot(t_val, y_val_interp(2,:),'-r', 'LineWidth', 2, 'DisplayName', 'Infected');
-plot(t_val, y_val_interp(3,:),'-b', 'LineWidth', 2, 'DisplayName', 'Recovered');
-xlabel('Time');
-title('SIR Model');
-legend;
-grid on;
-hold off;
+if delay
+    figure;
+    plot(t_val, y_val_interp(1,:),'-g', 'LineWidth', 2, 'DisplayName', 'Susceptible');
+    hold on;
+    plot(t_val, y_val_interp(2,:),'-r', 'LineWidth', 2, 'DisplayName', 'Infected');
+    plot(t_val, y_val_interp(3,:),'-b', 'LineWidth', 2, 'DisplayName', 'Recovered');
+    xlabel('Time');
+    title(sprintf('SIR Model, tau = %d', tau));
+    legend;
+    grid on;
+    hold off;
+else
+    figure;
+    plot(t_val, y_val_interp(:,1),'-g', 'LineWidth', 2, 'DisplayName', 'Susceptible');
+    hold on;
+    plot(t_val, y_val_interp(:,2),'-r', 'LineWidth', 2, 'DisplayName', 'Infected');
+    plot(t_val, y_val_interp(:,3),'-b', 'LineWidth', 2, 'DisplayName', 'Recovered');
+    xlabel('Time');
+    title(['SIR Model, tau = 0']);
+    legend;
+    grid on;
+    hold off;
+end
 
 function dydt = SIR_DDE_eqns(t,y,Z)
     priorI=Z(2,:);
@@ -71,6 +86,6 @@ function dydt = SIR_ODE_eqns(t,y)
 end
 
 function [a,b] = def_ab
-    a=0.1;                  %infection rate
+    a=0.01;                  %infection rate
     b=0.2;                  %recovery rate
 end
