@@ -2,7 +2,6 @@
 
 clear
 clc
-close all
 
 %parameters
 tau=1;                  %time people are sick
@@ -31,18 +30,13 @@ end
 
 if (length(t_val) ~= length(y_val))
     y_val_interp = interp1(linspace(t_val(1), t_val(end), size(y_val, 2)), y_val', t_val, 'linear')';
-else
-    y_val_interp = y_val;
 end
 
-disp(["",length(y_val_interp)])
-disp(["",length(t_val)])
-
 figure;
-plot(t_val, y_val_interp(1,:),'-g', 'LineWidth', 2, 'DisplayName', 'Susceptible');
+plot(t_val, y_val(1,:),'-g', 'LineWidth', 2, 'DisplayName', 'Susceptible');
 hold on;
-plot(t_val, y_val_interp(2,:),'-r', 'LineWidth', 2, 'DisplayName', 'Infected');
-plot(t_val, y_val_interp(3,:),'-b', 'LineWidth', 2, 'DisplayName', 'Recovered');
+plot(t_val, y_val(2,:),'-r', 'LineWidth', 2, 'DisplayName', 'Infected');
+plot(t_val, y_val(3,:),'-b', 'LineWidth', 2, 'DisplayName', 'Recovered');
 xlabel('Time');
 title('SIR Model');
 legend;
