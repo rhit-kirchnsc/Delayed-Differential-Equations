@@ -5,12 +5,12 @@ clc
 %close all
 
 %parameters
-tau=15;                   %time people are sick
+tau=10;                   %time people are sick
 tspan=[0 40];            %time
 delay = true;            %dde if true, ode if false
 
 %initial conditions
-S0=999;                   %initial susceptible
+S0=99;                   %initial susceptible
 I0=1;                    %initial infected
 R0=0;                   %initial recovered
 y0=[S0;I0;R0];
@@ -18,9 +18,7 @@ y0=[S0;I0;R0];
 if delay
     %history function
     [a, b] = def_ab;
-    f = @(t) [S0 * exp(-a * I0 * t);  % Approximate susceptible history
-          I0 * exp(a * S0 * t);   % Approximate infected history
-          R0];   
+    f = @(t) [S0 * exp(-a * I0 * t); I0 * exp(a * S0 * t); R0];   
     
     options = ddeset('RelTol',1e-6,'AbsTol',1e-12);
     sol=dde23(@(t,y,Z) SIR_DDE_eqns(t,y,Z), tau, f, tspan, options);
@@ -45,7 +43,7 @@ if delay
     plot(t_val, y_val_interp(2,:),'-r', 'LineWidth', 2, 'DisplayName', 'Infected');
     plot(t_val, y_val_interp(3,:),'-b', 'LineWidth', 2, 'DisplayName', 'Recovered');
     xlabel('Time');
-    title(sprintf('SIR Model, tau = %d, a = %d percent', tau, int16(a*1000)));
+    title(sprintf('SIR Model, tau = %d, a = %d percent', tau, int16(a*100)));
     legend;
     grid on;
     hold off;
@@ -56,7 +54,7 @@ else
     plot(t_val, y_val_interp(:,2),'-r', 'LineWidth', 2, 'DisplayName', 'Infected');
     plot(t_val, y_val_interp(:,3),'-b', 'LineWidth', 2, 'DisplayName', 'Recovered');
     xlabel('Time');
-    title(sprintf('SIR Model, tau = 0, a = %d percent', int16(a)));
+    title(sprintf('SIR Model, tau = 0, a = %d percent', int16(a*100)));
     legend;
     grid on;
     hold off;
@@ -97,6 +95,6 @@ function dydt = SIR_ODE_eqns(t,y)
 end
 
 function [a,b] = def_ab
-    a=0.0005;                  %infection rate
+    a=0.005;                  %infection rate
     b=0.01;                  %recovery rate
 end
